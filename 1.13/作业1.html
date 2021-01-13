@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            {{msg}}
+        </div>
+        <h1>{{num}}</h1>
+        <button @click="sya">更新数据</button>
+
+         <h1>mixin学习</h1>
+
+
+         <div v-red>
+            我是第一个
+        </div>
+
+        <div v-color="'blue'">
+            我是第二个v-color里面的内容
+        </div>
+
+        <input type="text" v-model="phone" v-mobile>
+
+
+        <h1>{{fn()}}</h1>
+        <h1>{{str}}</h1>
+
+
+
+        <p>
+            firstname  <input type="text" v-model="firstname" placeholder="姓">
+        </p>
+        <p>
+            lastname  <input type="text" v-model="lastname" placeholder="名">
+        </p>
+        <p>
+            fullname  <input type="text" v-model="fullname" placeholder="全名">
+           
+        </p>
+        <h1>{{fullname}}</h1>
+
+    </div>
+
+
+
+    <script src="../vue.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+    <script>
+    //------------------ mixin 学习----------------------------------
+        var myMixin = {
+            created:function(){
+                this.hello()
+            },
+            methods:{
+                hello:function(){
+                    console.log('我正在学习minxin');
+                }
+            }
+
+        }
+
+//-------------------------------自定义指令-----------------------------------------
+
+ //全局指令
+ Vue.directive('red',{
+            inserted:function(el){
+                el.style.color = 'red'
+            }
+        })
+
+        Vue.directive('color',{
+            inserted:function(el,binding){
+                el.style.color = binding.value
+            }
+        })
+
+
+        var app1 = new Vue({
+            mixins:[myMixin],
+            el: "#app",
+            data: {
+                fruits: ['apple', 'pear', 'banana', 'orange'],
+                msg: 'aaa',
+                num: 0,
+                phone:'',
+                firstname: '',
+                lastname: '',
+                fullname: ''
+            },
+            directives:{
+                mobile:{
+                    update:function(el){
+                        console.log(el.value);
+                        if(!(/^1[3-9]\d{9}$/).test(el.value)){
+                            el.style.color = 'red'
+                        }else{
+                            el.style.color = 'skyblue'
+                        }
+
+                    }
+                }
+            },
+            methods: {
+                submit() {
+                    console.log('我进入submit里面了');
+                },
+                b() {
+                    console.log('我进入b里面了');
+                },
+                sya() {
+                    console.log('我进入say里面了');
+                    this.num++
+                },
+                fn(){
+                    console.log('fn被调用了');
+                }
+            },
+            computed:{
+                str(){
+                    console.log('计算机执行了');
+                    return this.fruits
+                }
+            },
+            watch:{
+                firstname:function(val){
+                    this.fullname = val + '' +this.firstname
+                },
+                lastname:function(val){
+                    this.fullname = this.firstname + '' + val
+                }
+            },
+
+    //--------------------------生命周期-------------------------------------------
+            // 这是生命周期函数 beforCreate
+            // 创建之前 new操作部署能力过程 还没有全部完成
+            beforeCreate() {
+                console.log('我进入生命周期 beforeCreate里面');
+                console.log(this.data);
+            },
+
+            // 这是生命周期函数 created
+            // 创建之后 data methods 已经部署完成
+            created() {
+                console.log('进入生命周期created里面');
+                console.log(this.data);
+            },
+
+            // 虽然created数据已经架构完成 但是没有经过算法和dom元素的对比和插入
+            // 中间有算法 要 dom对比和插入 数据渲染之前  基本已经准备好了 就等最后给页面了
+            // 这一步是可以做最后异步的检查 对不对 如果不对 可以马上变
+            beforeMount() {
+                console.log('进入生命周期beforeMount里面了');
+                console.log(this.fruits);
+                this.b()
+                if(this.msg = 'aaa'){
+                    this.msg = '这是个正确的数据'
+                }
+            },
+
+            // 数据 data methods 都拿到了  数据也到了dom元素页面上了
+            mounted() {
+                console.log('mounted');
+
+                axios({
+                    url: 'http://localhost:5001/vuestudy/',
+                    method: 'get',
+                          params: {
+                     username: 'zs',
+
+                 }
+                }).then(response => {
+                    console.log(response)
+                    console.log(response.data[0].username);
+                    this.username = response.data[0].username
+
+
+                }).catch(error => {
+                    console.log(error)
+                })
+
+
+
+                // // post 请求
+                // axios({
+                //     url: 'http://localhost:5001/vuestudy',
+                //     method: 'post',
+                //     data:{
+                //         username:'zs',
+                //         pass:123123
+
+                //     }
+
+                // }).then(response => {
+                //     console.log(response)
+                //     console.log(response.data[0].username);
+                //     this.username = response.data[0].username
+
+
+                // }).catch(error => {
+                //     console.log(error)
+                // })
+            },
+
+            //数据更新之前
+            beforeUpdate() {
+                console.log('进入生命周期beforeUpdate里面了');
+            },
+
+            // 数据更新之后
+            updated(){
+                console.log('进入生命周期update里面了');
+            },
+
+            // 页面销毁之前
+            beforeDestroy(){
+                console.log('页面销毁之前');
+            },
+
+            // 页面销毁之后
+            destroy(){
+                console.log('页面销毁之后');
+            }
+
+
+        })
+        console.log(app1);
+    </script>
+</body>
+
+</html>

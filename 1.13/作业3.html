@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table{
+           background: pink;
+           /* border-spacing: 10px; */
+           border-collapse: collapse;
+        }
+        td,th{
+            width: 200px;
+            height: 80px;
+            border: 1px solid red;
+            text-align: center;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+       <div>
+            <table v-show="message">
+                <th>宇宙唯一id</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>年龄</th>
+                <th>班级</th>
+                <th>备注</th>
+                <tr v-for="item in message">
+                    <td v-for="index in item">
+                        {{index}}
+                    </td>
+                </tr>
+            </table>
+           <button @click="sya">获取数据</button>
+       </div>
+        
+        
+    </div>
+
+
+
+    <script src="../vue.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+    <script>
+        var app1 = new Vue({
+            el: "#app",
+            data: {
+                fruits: ['apple', 'pear', 'banana', 'orange'],
+                msg: 'aaa',
+                num: 0,
+                message:''
+            },
+            methods: {
+                submit() {
+                    console.log('我进入submit里面了');
+                },
+                b() {
+                    console.log('我进入b里面了');
+                },
+                sya() {
+                  
+                    axios({
+                    url: 'http://localhost:5001/vuestudy',
+                    method: 'get',
+                }).then(response => {
+                    console.log(response)
+                    console.log(response.data);
+                    this.message = response.data
+
+
+                }).catch(error => {
+                    console.log(error)
+                })
+                    console.log('我进入say里面了');
+                }
+            },
+            // 这是生命周期函数 beforCreate
+            // 创建之前 new操作部署能力过程 还没有全部完成
+            beforeCreate() {
+                console.log('我进入生命周期 beforeCreate里面');
+                console.log(this.data);
+            },
+
+            // 这是生命周期函数 created
+            // 创建之后 data methods 已经部署完成
+            created() {
+                console.log('进入生命周期created里面');
+                console.log(this.data);
+            },
+
+            // 虽然created数据已经架构完成 但是没有经过算法和dom元素的对比和插入
+            // 中间有算法 要 dom对比和插入 数据渲染之前  基本已经准备好了 就等最后给页面了
+            // 这一步是可以做最后异步的检查 对不对 如果不对 可以马上变
+            beforeMount() {
+                console.log('进入生命周期beforeMount里面了');
+                console.log(this.fruits);
+                this.b()
+                if (this.msg = 'aaa') {
+                    this.msg = '这是个正确的数据'
+                }
+            },
+
+            // 数据 data methods 都拿到了  数据也到了dom元素页面上了
+            mounted() {
+               
+            },
+
+            //数据更新之前
+            beforeUpdate() {
+                console.log('进入生命周期beforeUpdate里面了');
+            },
+
+            // 数据更新之后
+            updated() {
+                console.log('进入生命周期update里面了');
+            },
+
+            // 页面销毁之前
+            beforeDestroy() {
+                console.log('页面销毁之前');
+            },
+
+            // 页面销毁之后
+            destroy() {
+                console.log('页面销毁之后');
+            }
+
+
+        })
+        console.log(app1);
+    </script>
+</body>
+
+</html>
